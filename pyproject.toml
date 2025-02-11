@@ -21,7 +21,8 @@ dependencies = [
 ]
 
 [project.entry-points."mkdocs.plugins"]
-data = "mkdocs_badges_plugin.plugin:DataPlugin"
+badges = "mkdocs_badges_plugin.plugin:BadgesPlugin"
+
 
 [project.urls]
 Documentation = "https://joapuiib.github.io/mkdocs-data-plugin"
@@ -56,7 +57,7 @@ dependencies = [
 
 [tool.hatch.envs.test.scripts]
 test = [
-    "pytest -xs",
+    "pytest -vv",
 ]
 
 [[tool.hatch.envs.test.matrix]]
