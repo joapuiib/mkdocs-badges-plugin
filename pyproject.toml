@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mkdocs-data-plugin"
+name = "mkdocs-badges-plugin"
 dynamic = ["version"]
 description = "MkDocs plugin that allows to read data from markup files"
 readme = "README.md"

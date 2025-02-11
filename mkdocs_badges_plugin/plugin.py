@@ -52,9 +52,17 @@ class BadgesPlugin(BasePlugin[BadgesPluginConfig]):
     # Create badge
     def _badge(self, icon: str ="", text: list = [], type: str = "", href: str = "", title: str = "", _class: str = ""):
         classes = f"{_class} {_class}--{type}" if type else _class
+        icon_element = ""
+        if icon:
+            icon = f':{icon}:' if icon else ""
+            if title:
+                icon_element = f"<span class=\"{_class}__icon\" title=\"{title}\">{icon}</span>"
+            else:
+                icon_element = f"<span class=\"{_class}__icon\">{icon}</span>"
+
         return "".join([
             f"<span class=\"{classes}\">",
-            *([f"<span class=\"{_class}__icon\">{icon}</span>"] if icon else []),
+            *([icon_element] if icon_element else []),
             *[f"<span class=\"{_class}__text\">{t}</span>" for t in text],
             f"</span>",
         ])

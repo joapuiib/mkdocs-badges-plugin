@@ -61,14 +61,13 @@ def test_config_class_badge():
 
     _test(markdown_text, expected_html, config)
 
-def _test_typed_badge():
-    config = {'badges': {
+def test_typed_badge():
+    config = {
         'types': {
             'tag': {
                 'title': 'Tag',
                 'text': 'Tag',
                 'icon': 'material-tag'
-            }
         }
     }}
 
