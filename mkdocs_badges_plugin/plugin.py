@@ -41,16 +41,17 @@ class BadgesPlugin(BasePlugin[BadgesPluginConfig]):
         _text = [badge_config['text']] if 'text' in badge_config else []
         if match.group(2):
             _text += match.group(2).strip().split("|")
+
         _icon = badge_config.get('icon', None)
         _title = badge_config.get('title', None)
-
+        _href = badge_config.get('href', None)
 
         _class = self.config['classes']
 
-        return self._badge(icon=_icon, text=_text, type=_type, title=_title, _class=_class)
+        return self._badge(type=_type, icon=_icon, title=_title, text=_text, href=_href, _class=_class)
 
     # Create badge
-    def _badge(self, icon: str ="", text: list = [], type: str = "", href: str = "", title: str = "", _class: str = ""):
+    def _badge(self, type: str = "", icon: str ="", title: str = "", text: list = [], href: str = "", _class: str = ""):
         classes = f"{_class} {_class}--{type}" if type else _class
         icon_element = ""
         if icon:
@@ -61,10 +62,12 @@ class BadgesPlugin(BasePlugin[BadgesPluginConfig]):
                 icon_element = f"<span class=\"{_class}__icon\">{icon}</span>"
 
         return "".join([
+            *([f"<a href=\"{href}\" class=\"{_class}__link\">"] if href else []),
             f"<span class=\"{classes}\">",
             *([icon_element] if icon_element else []),
             *[f"<span class=\"{_class}__text\">{t}</span>" for t in text],
             f"</span>",
+            *(["</a>"] if href else [])
         ])
 
 

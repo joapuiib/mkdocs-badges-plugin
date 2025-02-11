@@ -88,3 +88,28 @@ def test_typed_badge():
     '''
 
     _test(markdown_text, expected_html, config)
+
+
+def test_typed_badge_href():
+    config = {
+        'types': {
+            'tag': {
+                'title': 'Tag',
+                'text': 'Tag',
+                'icon': 'material-tag',
+                'href': 'https://example.com'
+        }
+    }}
+
+    markdown_text = '[badge:tag]'
+
+    expected_html = R'''
+    <a href="https://example.com" class="mdx-badge__link">
+    <span class="mdx-badge mdx-badge--tag">
+    <span class="mdx-badge__icon" title="Tag">:material-tag:</span>
+    <span class="mdx-badge__text">Tag</span>
+    </span>
+    </a>
+    '''
+
+    _test(markdown_text, expected_html, config)
