@@ -12,6 +12,13 @@ def _test(markdown_text, expected_html, config={}):
     assert html == expected_html
 
 
+def test_escaped_badge():
+    markdown_text = '\\[badge Text]'
+    expected = '\\[badge Text]'
+
+    _test(markdown_text, expected)
+
+
 def test_generic_untyped_badge_single_text():
     markdown_text = '[badge Text]'
 

@@ -14,7 +14,7 @@ from re import Match
 
 log = get_plugin_logger(__name__)
 
-BADGE_PATTERN = r"\[badge(?::(\w+))?([^\]]*?)\]"
+BADGE_PATTERN = r"(?<!\\)\[badge(?::(\w+))?([^\]]*?)\]"
 
 class BadgesPluginConfig(base.Config):
     classes = c.Type(str, default='mdx-badge')
