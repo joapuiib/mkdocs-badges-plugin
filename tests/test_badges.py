@@ -95,21 +95,46 @@ def test_typed_badge_href():
         'types': {
             'tag': {
                 'title': 'Tag',
-                'text': 'Tag',
                 'icon': 'material-tag',
-                'href': 'https://example.com'
+                'href': 'https://example.com',
+                'text': 'Tag',
         }
     }}
 
     markdown_text = '[badge:tag]'
 
     expected_html = R'''
-    <a href="https://example.com" class="mdx-badge__link">
     <span class="mdx-badge mdx-badge--tag">
     <span class="mdx-badge__icon" title="Tag">:material-tag:</span>
+    <a href="https://example.com" class="mdx-badge__link">
+    <span class="mdx-badge__text">Tag</span>
+    </a>
+    </span>
+    '''
+
+    _test(markdown_text, expected_html, config)
+
+
+def test_typed_badge_icon_href():
+    config = {
+        'types': {
+            'tag': {
+                'title': 'Tag',
+                'icon': 'material-tag',
+                'icon_href': 'https://example.com',
+                'text': 'Tag',
+        }
+    }}
+
+    markdown_text = '[badge:tag]'
+
+    expected_html = R'''
+    <span class="mdx-badge mdx-badge--tag">
+    <a href="https://example.com" class="mdx-badge__link">
+    <span class="mdx-badge__icon" title="Tag">:material-tag:</span>
+    </a>
     <span class="mdx-badge__text">Tag</span>
     </span>
-    </a>
     '''
 
     _test(markdown_text, expected_html, config)

@@ -14,7 +14,7 @@ from re import Match
 
 log = get_plugin_logger(__name__)
 
-BADGE_PATTERN = r"(?<!\\)\[badge(?::(\w+))?([^\]]*?)\]"
+BADGE_PATTERN = r"(?<!\\)\[badge(?::([\w\-\_]+))?([^\]]*?)\]"
 
 class BadgesPluginConfig(base.Config):
     classes = c.Type(str, default='mdx-badge')
@@ -44,14 +44,26 @@ class BadgesPlugin(BasePlugin[BadgesPluginConfig]):
 
         _icon = badge_config.get('icon', None)
         _title = badge_config.get('title', None)
+        _icon_href = badge_config.get('icon_href', None)
+
+        _reference = badge_config.get('reference', None)
         _href = badge_config.get('href', None)
+        _href = self._resolve_path(_reference, page, files) if _reference else _href
 
         _class = self.config['classes']
 
-        return self._badge(type=_type, icon=_icon, title=_title, text=_text, href=_href, _class=_class)
+        return self._badge(**{
+            'type': _type,
+            'icon': _icon,
+            'icon_href': _icon_href,
+            'title': _title,
+            'text': _text,
+            'href': _href,
+            '_class': _class
+        })
 
     # Create badge
-    def _badge(self, type: str = "", icon: str ="", title: str = "", text: list = [], href: str = "", _class: str = ""):
+    def _badge(self, type: str = "", icon: str = "", icon_href: str = "", title: str = "", text: list = [], href: str = "", _class: str = ""):
         classes = f"{_class} {_class}--{type}" if type else _class
         icon_element = ""
         if icon:
@@ -62,12 +74,14 @@ class BadgesPlugin(BasePlugin[BadgesPluginConfig]):
                 icon_element = f"<span class=\"{_class}__icon\">{icon}</span>"
 
         return "".join([
-            *([f"<a href=\"{href}\" class=\"{_class}__link\">"] if href else []),
             f"<span class=\"{classes}\">",
+            *([f"<a href=\"{icon_href}\" class=\"{_class}__link\">"] if icon_href else []),
             *([icon_element] if icon_element else []),
+            *(["</a>"] if icon_href else []),
+            *([f"<a href=\"{href}\" class=\"{_class}__link\">"] if href else []),
             *[f"<span class=\"{_class}__text\">{t}</span>" for t in text],
+            *(["</a>"] if href else []),
             f"</span>",
-            *(["</a>"] if href else [])
         ])
 
 
