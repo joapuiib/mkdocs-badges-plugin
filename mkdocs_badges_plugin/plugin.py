@@ -1,8 +1,9 @@
 import json
 import os
+import posixpath
 import re
-
 import yaml
+
 from mkdocs.config import base
 from mkdocs.config import config_options as c
 from mkdocs.config.defaults import MkDocsConfig
@@ -26,41 +27,45 @@ class BadgesPlugin(BasePlugin[BadgesPluginConfig]):
         self, markdown: str, *, page: Page, config: MkDocsConfig, files: Files
     ):
         # Find and replace all external asset URLs in current page
-        return self.replace_badges(markdown)
+        return self.replace_badges(markdown, page, files)
 
-    def replace_badges(self, markdown: str):
+
+    def replace_badges(self, markdown: str, page: Page, files: Files):
+
+        # Replace callback
+        def replace(match: Match):
+            _type = match.group(1)
+            badge_config = self.config['types'].get(_type, {})
+
+            _text = [badge_config['text']] if 'text' in badge_config else []
+            if match.group(2):
+                _text += match.group(2).strip().split("|")
+
+            _icon = badge_config.get('icon', None)
+            _title = badge_config.get('title', None)
+            _icon_href = badge_config.get('icon_href', None)
+
+            _reference = badge_config.get('reference', None)
+            _href = badge_config.get('href', None)
+            _href = self._resolve_path(_reference, page, files) if _reference else _href
+
+            _class = self.config['classes']
+
+            return self._badge(**{
+                'type': _type,
+                'icon': _icon,
+                'icon_href': _icon_href,
+                'title': _title,
+                'text': _text,
+                'href': _href,
+                '_class': _class
+            })
+
         return re.sub(
             BADGE_PATTERN,
-            self.replace, markdown, flags = re.I | re.M
+            replace, markdown, flags = re.I | re.M
         )
 
-    def replace(self, match: Match):
-        _type = match.group(1)
-        badge_config = self.config['types'].get(_type, {})
-
-        _text = [badge_config['text']] if 'text' in badge_config else []
-        if match.group(2):
-            _text += match.group(2).strip().split("|")
-
-        _icon = badge_config.get('icon', None)
-        _title = badge_config.get('title', None)
-        _icon_href = badge_config.get('icon_href', None)
-
-        _reference = badge_config.get('reference', None)
-        _href = badge_config.get('href', None)
-        _href = self._resolve_path(_reference, page, files) if _reference else _href
-
-        _class = self.config['classes']
-
-        return self._badge(**{
-            'type': _type,
-            'icon': _icon,
-            'icon_href': _icon_href,
-            'title': _title,
-            'text': _text,
-            'href': _href,
-            '_class': _class
-        })
 
     # Create badge
     def _badge(self, type: str = "", icon: str = "", icon_href: str = "", title: str = "", text: list = [], href: str = "", _class: str = ""):
@@ -101,7 +106,7 @@ class BadgesPlugin(BasePlugin[BadgesPluginConfig]):
     # one additional level of `..` which we need to remove
     def _resolve_path(self, path: str, page: Page, files: Files):
         path, anchor, *_ = f"{path}#".split("#")
-        path = _resolve(files.get_file_from_path(path), page)
+        path = self._resolve(files.get_file_from_path(path), page)
         return "#".join([path, anchor]) if anchor else path
 
     # Resolve path of file relative to given page - the posixpath always includes
